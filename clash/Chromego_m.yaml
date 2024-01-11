@@ -1,0 +1,129 @@
+proxy-providers:
+  SUBS:
+    type: http
+    url: "https://mareep.netlify.app/sub/merged_proxies_new.yaml"
+    interval: 3600
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 300
+
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+external-controller: 127.0.0.1:9090
+ipv6: true
+geodata-mode: true
+geo-auto-update: true
+geo-update-interval: 24
+geox-url:
+  geoip: "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat"
+  geosite: "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat"
+
+dns:
+    enable: true
+    ipv6: true
+    default-nameserver: [223.5.5.5, 119.29.29.29, 8.8.8.8]
+    nameserver: ['https://dns.alidns.com/dns-query']
+    fallback: ['https://doh.pub/dns-query', 'https://dns.google/dns-query']
+
+proxies:
+  - name: "wireguard_WARP+"
+    type: wireguard
+    server: 188.114.97.142
+    port: 4177
+    ip: 172.16.0.2
+    private-key: SCgOhvj+zvTz3PEcB2pkR4V63s91zkQfVM5X2b/KYmo=
+    public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=
+    udp: true
+
+  - name: "wireguard_ZeroTrust"
+    type: wireguard
+    server: 188.114.97.142
+    port: 4177
+    ip: 172.16.0.2
+    private-key: YJYIJj/BqP1FA3hJFGQYX5WOF7Lf/JFk8OldCXD7BGE=
+    public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=
+    udp: true
+
+  - name: "socks_WARP+"
+    type: socks5
+    server: 127.0.0.1
+    port: 65500
+    udp: true
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - PROXY_FALLBACK
+      - PROXY_SELECT
+      - PROXY_AUTO
+
+  - name: PROXY_SELECT
+    type: select
+    proxies:
+      - "wireguard_WARP+"
+      - "wireguard_ZeroTrust"
+      - "socks_WARP+"
+    use:
+      - SUBS
+
+  - name: PROXY_AUTO
+    type: url-test
+    proxies:
+      - "wireguard_WARP+"
+      - "wireguard_ZeroTrust"
+      - "socks_WARP+"
+    use:
+      - SUBS
+    url: 'https://www.gstatic.com/generate_204'
+    interval: 300
+    tolerance: 50
+    lazy: true
+
+  - name: PROXY_FALLBACK
+    type: fallback
+    proxies:
+      - "wireguard_WARP+"
+      - "wireguard_ZeroTrust"
+      - "socks_WARP+"
+    use:
+      - SUBS
+    url: 'https://www.gstatic.com/generate_204'
+    interval: 300
+    lazy: true
+
+  - name: FINAL
+    type: select
+    proxies:
+      - DIRECT
+      - PROXY
+
+rules:
+  - DOMAIN,clash.razord.top,DIRECT
+  - DOMAIN,yacd.haishan.me,DIRECT
+  - DOMAIN-SUFFIX,addons.mozilla.org,PROXY
+  - DOMAIN-SUFFIX,alipansou.com,PROXY
+  - DOMAIN-SUFFIX,geacron.com,PROXY
+  - DOMAIN-SUFFIX,bing.com,PROXY
+  - DOMAIN-SUFFIX,bing.net,PROXY
+  - DOMAIN-SUFFIX,microsoft.com,PROXY
+  - DOMAIN-SUFFIX,microsoftonline.com,PROXY
+  - DOMAIN-SUFFIX,subhd.tv,PROXY
+  - DOMAIN-SUFFIX,alonestreaming.com,FINAL
+  - DOMAIN-SUFFIX,highwebmedia.com,FINAL
+  - DOMAIN-SUFFIX,mmcdn.com,FINAL
+  - DOMAIN-SUFFIX,mushroomtrack.com,FINAL
+  - DOMAIN-SUFFIX,ttvnw.net,FINAL
+  - GEOSITE,category-ads-all,REJECT
+  - GEOIP,lan,DIRECT
+  - GEOSITE,gfw,PROXY
+  - GEOSITE,greatfire,PROXY
+  - GEOIP,private,DIRECT
+  - GEOIP,cn,DIRECT
+  - GEOSITE,private,DIRECT
+  - GEOSITE,cn,DIRECT
+  - MATCH,FINAL
+  
