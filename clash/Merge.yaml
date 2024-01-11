@@ -35,31 +35,6 @@ dns:
     nameserver: ['https://dns.alidns.com/dns-query']
     fallback: ['https://doh.pub/dns-query', 'https://dns.google/dns-query']
 
-proxies:
-  - name: "wireguard_WARP+"
-    type: wireguard
-    server: 188.114.97.142
-    port: 4177
-    ip: 172.16.0.2
-    private-key: SCgOhvj+zvTz3PEcB2pkR4V63s91zkQfVM5X2b/KYmo=
-    public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=
-    udp: true
-
-  - name: "wireguard_ZeroTrust"
-    type: wireguard
-    server: 188.114.97.142
-    port: 4177
-    ip: 172.16.0.2
-    private-key: YJYIJj/BqP1FA3hJFGQYX5WOF7Lf/JFk8OldCXD7BGE=
-    public-key: bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo=
-    udp: true
-
-  - name: "socks_WARP+"
-    type: socks5
-    server: 127.0.0.1
-    port: 65500
-    udp: true
-
 proxy-groups:
   - name: PROXY
     type: select
